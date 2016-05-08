@@ -1,0 +1,9 @@
+PREFIX ex: <http://example.org/demo#>
+
+SELECT ?person
+WHERE {
+    ?person a ex:Person .
+    ?person ex:age ?age .
+    FILTER (?age > 18) .
+    }
+

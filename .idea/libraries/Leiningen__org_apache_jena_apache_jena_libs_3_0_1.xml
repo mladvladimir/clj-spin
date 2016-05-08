@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: org.apache.jena/apache-jena-libs:3.0.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/jena/apache-jena-libs/3.0.1/apache-jena-libs-3.0.1.pom!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,14 @@
+/target
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/
+clj-spin.iml
+catalog-v001.xml
+/resources/catalog-v001.xml

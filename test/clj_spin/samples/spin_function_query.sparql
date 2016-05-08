@@ -1,0 +1,7 @@
+PREFIX ss: <http://topbraid.org/examples/spinsquare#>
+
+SELECT *
+WHERE {
+    ?rectangle a ss:Rectangle .
+    BIND (ss:computeArea(?rectangle) AS ?area) .
+}
