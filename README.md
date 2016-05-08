@@ -1,11 +1,10 @@
 # clj-spin
 
-A simple clojure wrapper library around [SPIN API] (http://topbraid.org/spin/api/). 
-The purpose of project is to experiment with SPIN and Clojure and it's under active development ...
+A simple clojure wrapper library around [SPIN API] (http://topbraid.org/spin/api/) inspired and dependent on [yesparql](https://github.com/joelkuiper/yesparql). 
+The aim of this project is to experiment with SPIN API and Clojure. It's under active development ...
 
 ## Usage
-### Parsing and convert queries
-Significant parts of [yesparql](https://github.com/joelkuiper/yesparql) library are used in this examples since clj-spin is dependent on. 
+### Parse and convert queries
 Create SPARQL query string:
 ```
 ;; create sparql query string
@@ -35,7 +34,7 @@ Initialize SPIN registry and register all SPIN expressions from given ontology
 (init-spin-registry)
 (register-all spinsquare)
 ```
-Lets call "computeArea" function from SPARQL:
+Lets call `computeArea` function from SPARQL:
 ```
 (def test-spin-f "PREFIX ss: <http://topbraid.org/examples/spinsquare#>
                   SELECT *
@@ -43,7 +42,7 @@ Lets call "computeArea" function from SPARQL:
                     ?rectangle a ss:Rectangle .
                     BIND (ss:computeArea(?rectangle) AS ?area) .}")
 ```
-We can execute given query on spinsquare data previously stored in Jena model. 
+We can execute given query on `spinsquare` data previously stored in Jena model. 
 ```
 (require '[clj-spin.query :refer [execute-query]])
 (require '[yesparql.sparql :refer [->result result->json]])
@@ -53,8 +52,27 @@ We can execute given query on spinsquare data previously stored in Jena model.
    (result->json)
    (println))
 ```
+### Inference
+Fetching all rules defined in spinsquare ontology with `get-rules` will return map where the keys are class URIs and values are lists of corresponding queries.
+```
+(require '[clj-spin.utils :refer [create-default-model get-rules]])
+
+(println (get-rules spinsquare))
+```
+Create empty model to store inferred triples, add it as submodel to main model add apply run-inferences: 
+```
+(require '[clj-spin.inferences :refer [run-inferences]])
+(require '[yesparql.sparql :refer [result->ttl]])
+
+(def "new-triples" (create-default-model))
+(.addSubModel spinsquare new-triples)
+(register-all spinsquare)
+(run-inferences spinsquare new-triples)
+(println (model->ttl new-triples))
+```
+
+
 ## TODO:
-- Inference
 - Validation
 - Templates
 ## License

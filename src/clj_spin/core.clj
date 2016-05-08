@@ -38,10 +38,6 @@
 
 
 
-
-
-
-
 ;// Now turn it back into a Jena Query
 (defn ^Query spin->arq
   [spin-query]

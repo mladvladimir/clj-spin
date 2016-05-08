@@ -20,6 +20,7 @@
   ([^OntModel ont-model ^Model new-triples ^SPINExplanations explanations]
   (SPINInferences/run ont-model new-triples explanations nil false nil)))
 
+
 (defn explain-triple
   [^Triple triple]
   (doto
