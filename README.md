@@ -53,13 +53,13 @@ We can execute given query on `spinsquare` data previously stored in Jena model.
    (println))
 ```
 ### Inference
-Fetching all rules defined in spinsquare ontology with `get-rules` will return map where the keys are class URIs and values are lists of corresponding queries.
+Fetching all rules defined in spinsquare ontology with `get-rules` will return a map of class URIs as keys and lists of corresponding queries as values.
 ```
 (require '[clj-spin.utils :refer [create-default-model get-rules]])
 
 (println (get-rules spinsquare))
 ```
-Create empty model to store inferred triples, add it as submodel to main model add apply run-inferences: 
+Create empty model to store inferred triples, add it as submodel to main ontology model add apply `run-inferences`: 
 ```
 (require '[clj-spin.inferences :refer [run-inferences]])
 (require '[yesparql.sparql :refer [result->ttl]])
@@ -70,6 +70,7 @@ Create empty model to store inferred triples, add it as submodel to main model a
 (run-inferences spinsquare new-triples)
 (println (model->ttl new-triples))
 ```
+
 
 
 ## TODO:
