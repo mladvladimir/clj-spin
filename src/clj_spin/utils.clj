@@ -85,6 +85,9 @@
   (let [model (create-default-model)]
     (.read model file)))
 
+(defn isomorphic?
+  [model-a model-b]
+  (.isIsomorphicWith model-a model-b))
 
 ;(defn model->file
 ;  [^Model model]

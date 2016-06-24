@@ -1,0 +1,185 @@
+# baseURI: http://topbraid.org/examples/spinsquare
+# imports: http://spinrdf.org/spl
+
+# An example SPIN model about rectangles and squares, demonstrating all major
+# features of SPIN with simple examples.
+
+# Contact: Holger Knublauch (holger@topquadrant.com)
+
+@prefix arg: <http://spinrdf.org/arg#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix ss: <http://topbraid.org/examples/spinsquare#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+# The owl:Ontology (just for OWL tools that care) -----------------------------
+
+<http://topbraid.org/examples/spinsquare>
+  rdf:type owl:Ontology ;
+  rdfs:comment "A simple example model demonstrating some key features of SPIN. Have a look at the ss:computeArea function, the rule attached to ss:Rectangle and the constraint attached to ss:Square." ;
+  owl:imports <http://spinrdf.org/spl> ;
+  owl:versionInfo "1.2.0" .
+
+
+# Classes ---------------------------------------------------------------------
+
+ss:Rectangle
+  rdf:type rdfs:Class ;
+  rdfs:label "Rectangle" ;
+  spin:constraint [
+      rdf:type spl:Attribute ;
+      spl:maxCount 1 ;
+      spl:predicate ss:area ;
+      spl:valueType xsd:integer ;
+      rdfs:comment "The area of a Rectangle, defined as the product of width x height." ;
+    ] ;
+  spin:constraint [
+      rdf:type spl:Attribute ;
+      spl:maxCount 1 ;
+      spl:predicate ss:height ;
+      spl:valueType xsd:integer ;
+      rdfs:comment "The height of a Rectangle." ;
+    ] ;
+  spin:constraint [
+      rdf:type spl:Attribute ;
+      spl:maxCount 1 ;
+      spl:predicate ss:width ;
+      spl:valueType xsd:integer ;
+      rdfs:comment "The width of a Rectangle." ;
+    ] ;
+  spin:constraint [
+      rdf:type ss:PositivePropertyValueConstraint ;
+      arg:property ss:height ;
+    ] ;
+  spin:constraint [
+      rdf:type ss:PositivePropertyValueConstraint ;
+      arg:property ss:width ;
+    ] ;
+  spin:rule [
+      rdf:type sp:Construct ;
+      sp:text """
+        CONSTRUCT {
+            ?this ss:area ?area .                 # Infer ?area as a value of ss:area
+        }
+        WHERE {
+            ?this ss:width ?width .               # Get the width of ?this Rectangle
+            ?this ss:height ?height .             # Get the height of ?this Rectangle
+            BIND ((?width * ?height) AS ?area) .  # Compute area := width * height
+        }
+        """ ;
+    ] .
+    
+ss:Square
+  rdf:type rdfs:Class ;
+  rdfs:label "Square" ;
+  rdfs:subClassOf ss:Rectangle ;
+  spin:constraint [
+      rdf:type sp:Construct ;
+      sp:text """
+        # Width and height must be equal
+        CONSTRUCT {
+            _:cv a spin:ConstraintViolation ;
+                spin:violationRoot ?this ;
+                spin:violationPath ss:height ;
+                rdfs:label "Width and height of a Square must be equal"
+        } 
+        WHERE {
+            ?this ss:width ?width .
+            ?this ss:height ?height .
+            FILTER (?width != ?height) .
+        }
+        """ ;
+    ] .
+
+
+# Properties ------------------------------------------------------------------
+
+ss:area
+  rdf:type rdf:Property ;
+  rdfs:label "area" .
+
+ss:height
+  rdf:type rdf:Property ;
+  rdfs:label "height" .
+  
+ss:width
+  rdf:type rdf:Property ;
+  rdfs:label "width" .
+
+  
+# Example Instances -----------------------------------------------------------
+  
+ss:InvalidSquare
+  rdf:type ss:Square ;
+  ss:height 8 ;
+  ss:width 9 ;
+  rdfs:label "Invalid square" .
+  
+ss:TestRectangle
+  rdf:type ss:Rectangle ;
+  ss:height 6 ;
+  ss:width 7 ;
+  rdfs:label "Test rectangle" .
+
+
+# SPIN Templates --------------------------------------------------------------
+  
+ss:PositivePropertyValueConstraint
+  rdf:type spin:ConstructTemplate ;
+  rdfs:subClassOf spin:ConstructTemplates ;
+  rdfs:label "Positive property value constraint" ;
+  spin:labelTemplate "Values of property {?property} must be > 0" ;
+  rdfs:comment "A template that can be used to define a SPIN constraint on a given property (arg:property) to make sure that the values of that property are > 0." ;
+  spin:constraint [
+      rdf:type spl:Argument ;
+      spl:predicate arg:property ;
+      spl:valueType rdf:Property ;
+      rdfs:comment "The property to constrain (e.g. ss:width or ss:height)." ;
+    ] ;
+  spin:body [
+      rdf:type sp:Construct ;
+      sp:text """
+        CONSTRUCT {
+            _:cv a spin:ConstraintViolation ;
+                 spin:violationRoot ?this ;
+                 spin:violationPath ?property ;
+                 rdfs:label ?label .
+        }
+        WHERE {
+            ?this ?property ?value .
+            FILTER (?value <= 0) .
+            BIND (CONCAT(\"Property \", xsd:string(?property), 
+                \" must only have positive values, but found \", xsd:string(?value)) AS ?label) .
+        }
+        """ ;
+    ] .
+  
+# SPIN Functions --------------------------------------------------------------
+  
+ss:computeArea
+  rdf:type spin:Function ;
+  rdfs:subClassOf spin:Functions ;
+  rdfs:label "compute area" ;
+  rdfs:comment "Computes the area of a given rectangle (?arg1) as the product of its width and height." ;
+  spin:constraint [
+      rdf:type spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType ss:Rectangle ;
+      rdfs:comment "The rectangle to compute the area of." ;
+    ] ;
+  spin:body [
+      rdf:type sp:Select ;
+      sp:text """
+        SELECT ((?width * ?height) AS ?result)
+        WHERE {
+            ?arg1 ss:width ?width .
+            ?arg1 ss:height ?height .
+        }
+        """ ;
+    ] ;
+  spin:returnType xsd:integer .
