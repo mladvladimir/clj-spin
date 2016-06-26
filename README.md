@@ -4,6 +4,10 @@ A simple clojure wrapper library around [SPIN API] (http://topbraid.org/spin/api
 The aim of this project is to experiment with SPIN API and Clojure. It's under active development ...
 
 ## Usage
+
+[![Clojars Project]
+(https://img.shields.io/clojars/v/clj-spin.svg)](https://clojars.org/clj-spin)
+
 ### Parse and convert queries
 Create SPARQL query string:
 
@@ -100,7 +104,9 @@ Run `check-constraints` to get the list of SPIN ConstraintViolation objects:
 
 (check-constraints spinsquare)
 ```
+
 To get root resource of violation with corresponding messages we can use `get-root` and `get-messages`: 
+
 ```
 (require '[clj-spin.utils :refer [create-default-model get-rules]])
 

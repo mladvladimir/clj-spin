@@ -1,6 +1,6 @@
-(defproject clj-spin "0.1.0"
+(defproject clj-spin "0.1.0-SNAPSHOT"
   :description "Clojure wrapper of TopBraid SPIN API"
-  :url "http://example.com/FIXME"
+  :url "https://github.com/mladvladimir/clj-spin"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :repositories {"org.topbraid" "http://topquadrant.com/repository/spin"}
