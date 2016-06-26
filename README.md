@@ -9,7 +9,8 @@ Create SPARQL query string:
 
 ```
 ;; create sparql query string
-            (def query "PREFIX ex: <http://example.org/demo#>
+
+(def query "PREFIX ex: <http://example.org/demo#>
             SELECT ?person 
             WHERE { 
                 ?person a ex:Person . 
@@ -20,7 +21,6 @@ Create SPARQL query string:
 Serialize to SPIN Turtle representation and the URI of the new Query resource (or null for a blank node):
 
 ```
-(require '[clj-spin.core :refer [init-spin-registry register-all]])
 (require '[clj-spin.query :refer [serialize-spin]])
 
 (serialize-spin query "http://example-query.com" "TTL")
@@ -31,12 +31,16 @@ Serialize to SPIN Turtle representation and the URI of the new Query resource (o
 Load ontology with SPIN from [http://topbraid.org/examples/spinsquare.ttl](http://topbraid.org/examples/spinsquare.ttl) ([SPIN Primer: Rectangles and Squares](http://spinrdf.org/spinsquare.html))
 
 ```
+(require '[clj-spin.utils :refer [load-model-with-imports]])
+
 (def spinsquare (load-model-with-imports "http://topbraid.org/examples/spinsquare.ttl" "TTL"))
 ```
 
 Initialize SPIN registry and register all SPIN expressions from given ontology
 
 ```
+(require '[clj-spin.core :refer [init-spin-registry register-all]])
+
 (init-spin-registry)
 (register-all spinsquare)
 ```
@@ -70,26 +74,41 @@ Fetching all rules defined in spinsquare ontology with `get-rules` will return a
 
 ```
 (require '[clj-spin.utils :refer [create-default-model get-rules]])
-println (get-rules spinsquare))
+
+(println (get-rules spinsquare))
 ```
 
 Create empty model to store inferred triples, add it as submodel to main ontology model add apply `run-inferences`: 
 
 ```
 (require '[clj-spin.inferences :refer [run-inferences]])
-(require '[yesparql.sparql :refer [result->ttl]])
+(require '[yesparql.sparql :refer [model->ttl]])
 
-(def "new-triples" (create-default-model))
+(def new-triples (create-default-model))
 (.addSubModel spinsquare new-triples)
 (register-all spinsquare)
 (run-inferences spinsquare new-triples)
 (println (model->ttl new-triples))
 ```
 
+### Constraints
+
+Run `check-constraints` to get the list of SPIN ConstraintViolation objects:
+
+```
+(use '[clj-spin.constraints])
+
+(check-constraints spinsquare)
+```
+To get root resource of violation with corresponding messages we can use `get-root` and `get-messages`: 
+```
+(require '[clj-spin.utils :refer [create-default-model get-rules]])
+
+(map #(str ("Constraint violations for" get-label (get-root %)) ": "  (get-message %)) (check-constraints spinsquare))
+```
 
 
 ## TODO:
-- Validation
 - Templates
 ## License
 

@@ -5,8 +5,10 @@
                                       ModelFactory
                                       Resource
                                       Property]
+           [org.apache.jena.rdf.model.impl ResourceImpl]
 
            [org.topbraid.spin.model Command]
+           [org.topbraid.spin.system SPINLabels]
            [org.topbraid.spin.util JenaUtil
                                    SPINQueryFinder
                                    QueryWrapper]
@@ -74,6 +76,9 @@
   [^Model model]
   (get-expression-map model SPIN/rule))
 
+(defn ^String get-label
+  [^ResourceImpl resource]
+  (.getLabel (SPINLabels/get) resource))
 
 ;;model.listStatements(null, RDF.type, SP.Select);
 ;(defn get-functions

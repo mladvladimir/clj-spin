@@ -8,16 +8,9 @@
             [clojure.string :refer [split]])
 
   (:use clj-spin.query
-        clj-spin.utils))
+        clj-spin.utils
+        clj-spin.constraints))
 
-
-;(defn write-csv-file
-;  "Writes a csv file using a key and an s-o-s (sequence of sequences)"
-;  [out-sos out-file]
-;
-;  (spit out-file "" :append false)
-;  (with-open [out-data (io/writer out-file)]
-;    (csv/write-csv out-data out-sos)))
 
 
 
@@ -34,12 +27,19 @@
 (deftest spin-functions
   (testing "Calling SPIN function failed!"
     (is (= (do
-          (init-spin-registry)
-          (register-all spinsquare)
-          (->(execute-query spin-function-query spinsquare)
-             (->result)
-             (result->tsv)
-             (split #"\s")
-             (last)))
-        "42"))))
+             (init-spin-registry)
+             (register-all spinsquare)
+             (->(execute-query spin-function-query spinsquare)
+                (->result)
+                (result->tsv)
+                (split #"\s")
+                (last)))
+           "42"))))
 
+(deftest spin-constraints
+  (testing "Check SPIN Constraints failed!"
+    (is (= (do
+             (init-spin-registry)
+             (register-all spinsquare)
+             (map #(str (get-label (get-root %)) " - " (get-message %)) (check-constraints spinsquare)))
+           '["ss:InvalidSquare - Width and height of a Square must be equal"]))))

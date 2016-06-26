@@ -1,9 +1,10 @@
 (ns clj-spin.constraints
   (:import [org.topbraid.spin.constraints ConstraintViolation
                                           SPINConstraints]
-           [org.topbraid.spin.system SPINLabels]
+           [org.topbraid.spin.model.impl ConstructImpl]
 
            [org.apache.jena.rdf.model Model]
+           [org.apache.jena.rdf.model.impl ResourceImpl]
            [org.apache.jena.ontology OntModel]))
 
 (defn check-constraints
@@ -11,10 +12,24 @@
   (SPINConstraints/check model nil))
 
 
-(defn cv-messages
-  "Constraint Violation messages"
+(defn ^ResourceImpl get-root
+  "Get root resource of violation."
   [^ConstraintViolation cv]
-  (println
-    (str
-      (.getLabel (SPINLabels/get) (.getRoot cv))
-      (.getMessage cv))))
+  (.getRoot cv))
+
+
+(defn ^String get-message
+  "Get message explaining the error."
+  [^ConstraintViolation cv]
+  (.getMessage cv))
+
+
+
+(defn ^ConstructImpl get-source
+  [^ConstraintViolation cv]
+  (.getSource  cv))
+
+
+
+
+
